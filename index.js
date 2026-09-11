@@ -18,8 +18,11 @@ const client = new Client({
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
             '--single-process',
-            '--no-zygote'
+            '--disable-gpu'
         ]
     }
 });
@@ -39,6 +42,7 @@ client.on('ready', () => {
     console.log('¡Bot de WhatsApp conectado y listo!');
 });
 
+// Lógica de comandos del torneo
 client.on('message', async (msg) => {
     const texto = msg.body.trim().toLowerCase();
     console.log('Mensaje recibido:', texto);
