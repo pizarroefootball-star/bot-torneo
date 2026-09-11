@@ -5,7 +5,6 @@ const express = require('express');
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
@@ -14,7 +13,9 @@ const client = new Client({
             '--no-zygote'
         ]
     }
-});// Estado del torneo
+});
+
+// Estado del torneo
 let torneo = {
     activo: false,
     jugadores: [], // Objetos { id: '12345@c.us', nombre: 'Juan' }
