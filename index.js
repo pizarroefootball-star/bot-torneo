@@ -90,3 +90,62 @@ app.listen(port, () => {
 });
 
 client.initialize();
+// Arreglo para almacenar los participantes inscritos
+let participantes = [];
+let torneoIniciado = false;
+
+client.on('message', async (msg) => {
+    const texto = msg.body.trim();
+
+    // Comando para registrarse al torneo
+    if (texto.startsWith('!inscribir')) {
+        const nombreJugador = texto.replace('!inscribir', '').trim();
+        
+        if (!nombreJugador) {
+            await msg.reply('❌ Por favor, escribe tu nombre después del comando. Ejemplo: *!inscribir Juan*');
+            return;
+        }
+
+        if (torneoIniciado) {
+            await msg.reply('⚠️ Lo siento, el torneo ya ha comenzado y las inscripciones están cerradas.');
+            return;
+        }
+
+        if (participantes.includes(nombreJugador)) {
+            await msg.reply(`⚠️ ${nombreJugador}, ya estás inscrito en el torneo.`);
+            return;
+        }
+
+        if (participantes.length < 8) {
+            participantes.push(nombreJugador);
+            await msg.reply(`✅ ¡Inscripción exitosa, ${nombreJugador}! (${participantes.length}/8 cupos llenos).`);
+
+            // Si se llenan los 8 cupos, genera el torneo automáticamente
+            if (participantes.length === 8) {
+                torneoIniciado = true;
+                await msg.reply('🏆 ¡Cupos llenos! El torneo de 8 jugadores ha comenzado. Aquí están los cruces de cuartos de final:\n\n' +
+                    `1️⃣ ${participantes[0]} vs ${participantes[1]}\n` +
+                    `2️⃣ ${participantes[2]} vs ${participantes[3]}\n` +
+                    `3️⃣ ${participantes[4]} vs ${participantes[5]}\n` +
+                    `4️⃣ ${participantes[6]} vs ${participantes[7]}`
+                );
+            }
+        }
+    }
+
+    // Comando para ver la lista de inscritos actual
+    if (texto === '!lista') {
+        if (participantes.length === 0) {
+            await msg.reply('📋 No hay participantes inscritos todavía.');
+        } else {
+            await msg.reply(`📋 *Participantes inscritos (${participantes.length}/8):*\n` + participantes.map((p, i) => `${i + 1}. ${p}`).join('\n'));
+        }
+    }
+
+    // Comando para reiniciar el torneo (útil para pruebas)
+    if (texto === '!reset') {
+        participantes = [];
+        torneoIniciado = false;
+        await msg.reply('🔄 El torneo ha sido reiniciado. Las inscripciones están abiertas de nuevo.');
+    }
+});
