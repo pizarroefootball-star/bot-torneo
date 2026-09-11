@@ -1,5 +1,5 @@
 const express = require('express');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode');
 
 const app = express();
@@ -11,7 +11,6 @@ let participantes = [];
 let torneoIniciado = false;
 
 const client = new Client({
-    authStrategy: new LocalAuth({ clientId: 'bot-torneo-session' }),
     puppeteer: {
         headless: true,
         args: [
@@ -28,7 +27,7 @@ const client = new Client({
 });
 
 client.on('qr', async (qr) => {
-    console.log('Generando nuevo código QR para la web...');
+    console.log('Generando nuevo código QR...');
     try {
         qrCodeDataUrl = await qrcode.toDataURL(qr);
     } catch (err) {
@@ -39,10 +38,9 @@ client.on('qr', async (qr) => {
 client.on('ready', () => {
     clientReady = true;
     qrCodeDataUrl = '';
-    console.log('¡Bot de WhatsApp conectado y listo!');
+    console.log('¡Bot conectado y listo!');
 });
 
-// Lógica de comandos del torneo
 client.on('message', async (msg) => {
     const texto = msg.body.trim().toLowerCase();
     console.log('Mensaje recibido:', texto);
@@ -93,24 +91,24 @@ client.on('message', async (msg) => {
 
 app.get('/', (req, res) => {
     if (clientReady) {
-        res.send('<h1 style="color:#22c55e;text-align:center;padding-top:50px;font-family:Arial;">✅ ¡Bot conectado y respondiendo comandos!</h1>');
+        res.send('<h1 style="color:green;text-align:center;padding-top:50px;">✅ ¡Bot conectado y respondiendo comandos!</h1>');
     } else if (qrCodeDataUrl) {
         res.send(`
             <html lang="es">
             <head><meta http-equiv="refresh" content="10"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-            <body style="background:#0f172a;color:#fff;text-align:center;padding-top:20px;font-family:Arial;">
-                <h2>📱 Escanea el Código QR</h2>
-                <div style="background:#fff;display:inline-block;padding:15px;border-radius:10px;"><img src="${qrCodeDataUrl}" width="260"/></div>
+            <body style="text-align:center;padding-top:20px;">
+                <h2>📱 Escanea el QR</h2>
+                <img src="${qrCodeDataUrl}" width="280"/>
             </body>
             </html>
         `);
     } else {
-        res.send('<h2 style="color:#fff;background:#0f172a;text-align:center;padding-top:50px;font-family:Arial;">⏳ Iniciando el navegador, recarga en unos segundos...</h2>');
+        res.send('<h2 style="text-align:center;padding-top:50px;">⏳ Iniciando... recarga en unos segundos.</h2>');
     }
 });
 
 app.listen(port, () => {
-    console.log(`Servidor web corriendo en el puerto ${port}`);
+    console.log(`Servidor en puerto ${port}`);
 });
 
 client.initialize();
