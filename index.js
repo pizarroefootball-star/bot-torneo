@@ -5,10 +5,16 @@ const express = require('express');
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || null,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--single-process',
+            '--no-zygote'
+        ]
     }
-});
-// Estado del torneo
+});// Estado del torneo
 let torneo = {
     activo: false,
     jugadores: [], // Objetos { id: '12345@c.us', nombre: 'Juan' }
