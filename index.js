@@ -3,9 +3,11 @@ const qrcode = require('qrcode-terminal');
 const express = require('express');
 
 const client = new Client({
-    authStrategy: new LocalAuth()
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    }
 });
-
 // Estado del torneo
 let torneo = {
     activo: false,
